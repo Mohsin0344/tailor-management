@@ -3,15 +3,17 @@ const Sizes = require('../models/sizes');
 
 module.exports = {
     createUser: async (req, res, next) => {
-        let { name, age, gender, address, phone_number} = req.body;
+
         try {
+
+            let { name, age, gender, address, phone_number} = req.body;
+
             if(!name || !age || !gender || !address || !phone_number) {
-                res.status(400).send(
+                return res.status(400).send(
                     {
                         "message": "Some data is missing"
                     }
                 );
-                return;
             }
             const createdUser = await user.create(
                 {
@@ -34,8 +36,10 @@ module.exports = {
     },
 
     get: async (req, res, next) => {
-        const userId = req.userId;
+    
         try {
+
+            const userId = req.userId;
 
             if(!userId) {
                 return res.send({
@@ -71,12 +75,13 @@ module.exports = {
     },
 
     addSizes: async (req, res, next) => {
-        const userId = req.userId;
-        const {length, width, fk_size_type_id} = req.body;
 
          try {
 
-            if(!userId || !length, !width, !fk_size_type_id) {
+            const userId = req.userId;
+            const {length, width, fk_size_type_id} = req.body;
+
+            if(!userId || !length || !width || !fk_size_type_id) {
                 return res.send(
                     {
                         "message": "Some data is missing",
