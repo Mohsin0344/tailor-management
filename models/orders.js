@@ -1,14 +1,14 @@
 const sequelize = require('../config/dbConfig');
 const Sequelize = require('sequelize');
 
-  var users = sequelize.define("users", {
+  var users = sequelize.define("orders", {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
-    },
+    }, 
     fk_user_id: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
     },
     delivery_date: {
       type: Sequelize.STRING,
@@ -16,6 +16,9 @@ const Sequelize = require('sequelize');
     is_delivered: {
         type: Sequelize.BOOLEAN,
         default: false
+    },
+    fk_size_id: {
+      type: Sequelize.INTEGER
     }
   });
 
