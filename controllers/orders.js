@@ -12,7 +12,6 @@ module.exports = {
             const userId = req.userId;
             const { delivery_date, fk_size_id } = req.body;
 
-            console.log(userId);
             if(!delivery_date || !fk_size_id) {
                 return res.send(
                     {
