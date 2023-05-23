@@ -8,7 +8,7 @@ const Sequelize = require('sequelize');
       primaryKey: true
     },
     name: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
     },
   });
 
