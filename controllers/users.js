@@ -38,7 +38,9 @@ module.exports = {
                       "data": createdUser
                     });
                   } catch (err) {
-                    res.status(500).send("An error occurred while creating the user.");
+                    res.status(500).send({
+                        "message": e.message,
+                    });
                   }
                 });
               });
