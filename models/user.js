@@ -22,6 +22,12 @@ const Sequelize = require('sequelize');
     address: {
         type: Sequelize.STRING
     },
+    email: {
+      type: Sequelize.STRING
+  },
+  password: {
+    type: Sequelize.STRING
+  },
   });
 
 

@@ -1,34 +1,50 @@
 const user = require("../models/user");
 const Sizes = require('../models/sizes');
 const Order = require('../models/orders');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+let ePassword;
 
 module.exports = {
     createUser: async (req, res, next) => {
 
         try {
 
-            let { name, age, gender, address, phone_number} = req.body;
+            let { name, age, gender, address, phone_number, email, password } = req.body;
 
-            if(!name || !age || !gender || !address || !phone_number) {
+            if(!name || !age || !gender || !address || !phone_number || !email || !password) {
                 return res.status(400).send(
                     {
                         "message": "Some data is missing"
                     }
                 );
             }
-            const createdUser = await user.create(
-                {
-                    name: name,
-                    age: age,
-                    phone_number: phone_number,
-                    address: address,
-                    gender: gender
-                }
-            );
-            res.send({
-                "message": "User created successfully",
-                "data": createdUser
-            });
+            
+            bcrypt.genSalt(saltRounds, function(err, salt) {
+                bcrypt.hash(password, salt, async function(err, hash) {
+                  try {
+                    const createdUser = await user.create({
+                      name: name,
+                      age: age,
+                      phone_number: phone_number,
+                      address: address,
+                      gender: gender,
+                      email: email,
+                      password: hash 
+                    });
+              
+                    res.send({
+                      "message": "User created successfully",
+                      "data": createdUser
+                    });
+                  } catch (err) {
+                    res.status(500).send({
+                        "message": e.message,
+                    });
+                  }
+                });
+              });
+              
         } catch(e) {
             res.status(400).send({
                 "message": e.message,
