@@ -1,5 +1,6 @@
 const sequelize = require('../config/dbConfig');
 const Sequelize = require('sequelize');
+const bcrypt = require('bcrypt');
 
   var users = sequelize.define("users", {
     id: {
@@ -28,6 +29,18 @@ const Sequelize = require('sequelize');
   password: {
     type: Sequelize.STRING
   },
+  });
+
+  users.beforeSave(async (user) => {
+    if (user.changed('password')) {
+      const saltRounds = 10;
+      try {
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+        user.password = hashedPassword;
+      } catch (error) {
+        throw new Error('Error hashing password');
+      }
+    }
   });
 
 
