@@ -19,36 +19,96 @@ module.exports = {
                     }
                 );
             }
+
+            const checkIfUserAlreadyExists = await user.findOne(
+                {
+                    where: {
+                        email
+                    }
+                }
+            );
+
+            if(checkIfUserAlreadyExists) {
+                return res.send(
+                    {
+                        "message": "User already exists"
+                    }
+                );
+            }
             
-            bcrypt.genSalt(saltRounds, function(err, salt) {
-                bcrypt.hash(password, salt, async function(err, hash) {
-                  try {
-                    const createdUser = await user.create({
-                      name: name,
-                      age: age,
-                      phone_number: phone_number,
-                      address: address,
-                      gender: gender,
-                      email: email,
-                      password: hash 
-                    });
-              
-                    res.send({
-                      "message": "User created successfully",
-                      "data": createdUser
-                    });
-                  } catch (err) {
-                    res.status(500).send({
-                        "message": e.message,
-                    });
-                  }
-                });
+            const createdUser = await user.create({
+                name: name,
+                age: age,
+                phone_number: phone_number,
+                address: address,
+                gender: gender,
+                email: email,
+                password 
+              });
+        
+              res.send({
+                "message": "User created successfully",
+                "data": createdUser
               });
               
         } catch(e) {
             res.status(400).send({
                 "message": e.message,
             });
+        }
+    },
+
+    login: async (req, res, next) => {
+
+        try {
+            const { email, password} = req.body;
+
+            if(!email || !password) {
+                return res.status(400).send(
+                    {
+                        "message": "email and password are required"
+                    }
+                );
+            }
+
+            const loginUser = await user.findOne(
+                {
+                    where: {
+                        email
+                    }
+                }
+            );
+
+            if(!loginUser) {
+               return res.status(404).send(
+                    {
+                        "message": "User does not exists try another mail or sign up"
+                    }
+                );
+            }
+
+            bcrypt.compare(password, loginUser.password, function(err, result) {
+                if(result) {
+                   return res.send(
+                        {
+                            "message": "Logged in successfully"
+                        }
+                    );
+                }
+
+                res.status(400).send(
+                    {
+                        "messsage": "Incorrect Passoword"
+                    }
+                );
+            });
+
+        } catch(e) {
+            res.status(500).send(
+                {
+                    "message": e
+                }
+            );
         }
     },
 
