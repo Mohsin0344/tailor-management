@@ -12,6 +12,8 @@ router.get('/getAll', (req, res) => {
 
 router.post("/createUser", userController.createUser);
 
+router.post('/login', userController.login);
+
 router.use("/:userId", checkUser, addInfoRoute);
 
 
