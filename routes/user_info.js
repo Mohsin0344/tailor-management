@@ -3,6 +3,7 @@ var router = express.Router();
 const checkUser = require('../middleware/checkUser');
 const addInfoRoute = require("./add_info");
 const userController = require("../controllers/users");
+const verifyToken = require("../middleware/verify_token");
 
 router.get('/getAll', (req, res) => {
     res.send({
@@ -14,7 +15,7 @@ router.post("/createUser", userController.createUser);
 
 router.post('/login', userController.login);
 
-router.use("/:userId", checkUser, addInfoRoute);
+router.use("/:userId", verifyToken, addInfoRoute);
 
 
 module.exports = router;

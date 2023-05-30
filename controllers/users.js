@@ -2,8 +2,7 @@ const user = require("../models/user");
 const Sizes = require('../models/sizes');
 const Order = require('../models/orders');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
-let ePassword;
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     createUser: async (req, res, next) => {
@@ -71,11 +70,13 @@ module.exports = {
                 );
             }
 
-            const loginUser = await user.findOne(
+            let loginUser = await user.findOne(
                 {
                     where: {
                         email
-                    }
+                    },
+                    raw:true
+
                 }
             );
 
@@ -87,21 +88,26 @@ module.exports = {
                 );
             }
 
-            bcrypt.compare(password, loginUser.password, function(err, result) {
-                if(result) {
-                   return res.send(
-                        {
-                            "message": "Logged in successfully"
-                        }
-                    );
-                }
-
-                res.status(400).send(
+            const match = bcrypt.compare(password, loginUser.password)
+            if(!match){
+                       res.status(400).send(
                     {
                         "messsage": "Incorrect Passoword"
                     }
                 );
-            });
+            }
+            delete loginUser.password
+            const token = jwt.sign({user:loginUser}, 'someSecretKey');
+
+           return res.send(
+                {
+                    "message": "Logged in successfully",
+                    "data": {
+                        "userId": loginUser.id,
+                        token
+                    }
+                }
+            );
 
         } catch(e) {
             res.status(500).send(
