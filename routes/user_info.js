@@ -15,7 +15,7 @@ router.post("/createUser", userController.createUser);
 
 router.post('/login', userController.login);
 
-router.use("/:userId", checkUser, verifyToken, addInfoRoute);
+router.use("/:userId", verifyToken, addInfoRoute);
 
 
 module.exports = router;
