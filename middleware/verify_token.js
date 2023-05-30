@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     console.log(req.headers);
-
-    const { accesstoken } = req.headers;
+    const { userId } = req.params
+    const  accesstoken  = req.headers['authorization'];
 
     if(!accesstoken) {
         return res.status(401).send(
@@ -11,12 +12,22 @@ module.exports = (req, res, next) => {
         );
     }
 
-    jwt.verify(accesstoken, "someSecretKey", (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid token' });
-          }
+    const decoded = jwt.verify(accesstoken, "someSecretKey");
 
-          req.userId = decoded.userId;
-          next();
-    });
+    const user  = await User.findByPk(userId);
+
+    if(!user) {
+        return res.status(404).send(
+            {
+                message: "user does not exists"
+            }
+        );
+    }
+
+    if(user.id !== decoded.user.id) {
+        return res.status(403).json({ message: 'Invalid token' });
+    }
+
+    req.userId = userId;
+    next();
 }
