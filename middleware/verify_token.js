@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
-    const { accessToken, userId } = req.headers;
+    console.log(req.headers);
 
-    if(!accessToken || !userId) {
+    const { accesstoken } = req.headers;
+
+    if(!accesstoken) {
         return res.status(401).send(
             { message: 'Token not provided' }
         );
     }
 
-    jwt.verify(accessToken, "someSecretKey", (err, decoded) => {
+    jwt.verify(accesstoken, "someSecretKey", (err, decoded) => {
         if (err) {
             return res.status(403).json({ message: 'Invalid token' });
           }
