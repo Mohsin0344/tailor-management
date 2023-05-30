@@ -2,8 +2,7 @@ const user = require("../models/user");
 const Sizes = require('../models/sizes');
 const Order = require('../models/orders');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
-let ePassword;
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     createUser: async (req, res, next) => {
@@ -89,9 +88,21 @@ module.exports = {
 
             bcrypt.compare(password, loginUser.password, function(err, result) {
                 if(result) {
+                    const token = jwt.sign({
+                        "userId": loginUser.id,
+                        "email": loginUser.email,
+                        "name": loginUser.name,
+                        "age": loginUser.age,
+                        "gender": loginUser.gender,
+                        "address": loginUser.address
+                    }, 'someSecretKey');
                    return res.send(
                         {
-                            "message": "Logged in successfully"
+                            "message": "Logged in successfully",
+                            "data": {
+                                "userId": loginUser.id,
+                                token
+                            }
                         }
                     );
                 }
