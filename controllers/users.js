@@ -70,11 +70,13 @@ module.exports = {
                 );
             }
 
-            const loginUser = await user.findOne(
+            let loginUser = await user.findOne(
                 {
                     where: {
                         email
-                    }
+                    },
+                    raw:true
+
                 }
             );
 
@@ -86,33 +88,26 @@ module.exports = {
                 );
             }
 
-            bcrypt.compare(password, loginUser.password, function(err, result) {
-                if(result) {
-                    const token = jwt.sign({
-                        "userId": loginUser.id,
-                        "email": loginUser.email,
-                        "name": loginUser.name,
-                        "age": loginUser.age,
-                        "gender": loginUser.gender,
-                        "address": loginUser.address
-                    }, 'someSecretKey');
-                   return res.send(
-                        {
-                            "message": "Logged in successfully",
-                            "data": {
-                                "userId": loginUser.id,
-                                token
-                            }
-                        }
-                    );
-                }
-
-                res.status(400).send(
+            const match = bcrypt.compare(password, loginUser.password)
+            if(!match){
+                       res.status(400).send(
                     {
                         "messsage": "Incorrect Passoword"
                     }
                 );
-            });
+            }
+            delete loginUser.password
+            const token = jwt.sign({user:loginUser}, 'someSecretKey');
+
+           return res.send(
+                {
+                    "message": "Logged in successfully",
+                    "data": {
+                        "userId": loginUser.id,
+                        token
+                    }
+                }
+            );
 
         } catch(e) {
             res.status(500).send(
